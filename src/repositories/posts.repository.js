@@ -23,23 +23,23 @@ class PostRepository {
     getPostsByHashTag(hashTag) {
         const query = `
         SELECT p.*, 
-            COUNT(l.id) AS total_likes, 
-            ARRAY(
-                SELECT unnest(array_agg(u.username)) 
-                FROM unnest(array_agg(u.username)) 
-                LIMIT 2
-            ) AS liked_users,
-            EXISTS (
-                SELECT 1 
-                FROM likes 
-                WHERE user_id = 1 
-                AND post_id = p.id
-            ) AS user_liked,
-            (
-                SELECT users.username 
-                FROM users 
-                WHERE p.user_id = users.id
-            ) AS author_username
+        COUNT(l.id) AS total_likes, 
+                ARRAY(
+                    SELECT unnest(array_agg(u.username)) 
+                    FROM unnest(array_agg(u.username)) 
+                    LIMIT 2
+                ) AS liked_users,
+                EXISTS (
+                    SELECT 1 
+                    FROM likes 
+                    WHERE user_id = 1 
+                    AND post_id = p.id
+                ) AS user_liked,
+                (
+                    SELECT json_build_object('username', username, 'picture', picture_url) 
+                    FROM users 
+                    WHERE p.user_id = users.id
+                ) AS author
         FROM posts p
         JOIN trending_posts tr ON p.id = tr.post_id
         JOIN trendings t ON t.id = tr.trending_id
