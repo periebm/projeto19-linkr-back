@@ -15,13 +15,15 @@ export async function createPost(req, res) {
   try {
     const { user_id, description, url } = req.body;
 
-    //const hashtags = extractHashtags(description);
+    const hashtags = extractHashtags(description);
 
     const { rows } = await PostsRepository.createPost(user_id, description, url);
 
-    //for (let i = 0; i < hashtags.length; i++) {
-    //  await TrendingsRepository.createTrending(hashtags[i], rows[0].id);
-    //}
+    if (hashtags.length > 0) {
+      for (let i = 0; i < hashtags.length; i++) {
+        await TrendingsRepository.createTrending(hashtags[i], rows[0].id);
+      }
+    }
 
     res.status(201).json({ message: 'Post criado' });
   } catch (err) {
