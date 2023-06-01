@@ -15,7 +15,7 @@ export async function authValidate(req, res, next) {
   try {
     const data = jwt.verify(token, secretKey);
 
-    const session = await db.query(`SELECT * FROM sessions WHERE "userId"=$1`, [data.id]);
+    const session = await db.query(`SELECT * FROM users WHERE id=$1`, [data.id]);
     if (session.rows.length === 0) return res.status(401).send("Sessao nao encontrada");
     res.locals.session = session;
 
@@ -38,6 +38,7 @@ export async function loginValidate(req, res, next) {
     if (!isValidPassword) return res.sendStatus(401);
 
     res.locals.userId = user.userId;
+    res.locals.pictureUrl = user.picture_url
     next();
   } catch (err) {
     res.status(500).send(err.message);
