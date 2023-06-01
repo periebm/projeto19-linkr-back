@@ -17,3 +17,9 @@ export async function findUserForLogin(email) {
     )?.rows[0] || null
   );
 }
+
+export async function getUsersDB(){
+    return db.query(`
+        SELECT * FROM users
+      `)
+}
