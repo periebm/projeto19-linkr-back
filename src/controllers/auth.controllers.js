@@ -18,10 +18,10 @@ export default class AuthControllers {
   }
 
   async login(req, res) {
-    const { userId } = res.locals;
+    const { userId, pictureUrl } = res.locals;
     const secretKey = process.env.SECRET_KEY || "mySecret";
     try {
-      const data = { id: userId };
+      const data = { id: userId, pictureUrl };
       const token = jwt.sign(data, secretKey);
       res.status(200).send({ token });
     } catch (err) {

@@ -2,7 +2,11 @@ import { db } from "../database/db.connection.js";
 
 class PostRepository {
     getPosts() {
-        const query = `SELECT * FROM posts ORDER BY createdAt DESC LIMIT 20`;
+        const query = `SELECT posts.*, users.username, users.picture_url
+        FROM posts
+        INNER JOIN users ON posts.user_id = users.id
+        ORDER BY posts.createdAt DESC
+        LIMIT 20;`;
         return db.query(query);
     }
 
