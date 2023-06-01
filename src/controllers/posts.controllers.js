@@ -1,4 +1,3 @@
-import { db } from "../database/db.connection.js";
 import extractHashtags from "../helpers/extractHashtags.js";
 import PostsRepository from "../repositories/posts.repository.js";
 import TrendingsRepository from "../repositories/trendings.repository.js";

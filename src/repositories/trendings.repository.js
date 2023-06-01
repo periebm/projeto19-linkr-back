@@ -9,8 +9,15 @@ class TrendingsRepository {
             INSERT INTO trending_posts (trending_id, post_id) values($1, $2);
         `;
 
-        const { rows } = await db.query(firstQuery, [hashtag])
+        const { rows } = await db.query(firstQuery, [hashtag]);
         await db.query(secondQuery, [rows[0].id, post]);
+    }
+
+    getTrendings() {
+        const query = `
+            SELECT t.name FROM trendings t GROUP BY t.name;
+        `;
+        return db.query(query);
     }
 }
 
