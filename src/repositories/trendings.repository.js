@@ -19,6 +19,29 @@ class TrendingsRepository {
         `;
         return db.query(query);
     }
+
+    getTrendingIdByPost(postId) {
+        const query = `
+            SELECT tp.trending_id, t.name 
+            FROM trending_posts tp 
+            JOIN trendings t ON t.id = tp.trending_id
+            WHERE tp.post_id = $1;
+        `;
+        return db.query(query, [postId]);
+    }
+
+    async deleteTrendingById(trendingId, postId) {
+        const firstQuery = `
+            DELETE FROM trending_posts WHERE trending_id = $1 AND post_id = $2;
+        `;
+
+        const secondQuery = `
+            DELETE FROM trendings WHERE id = $1;
+        `;
+
+        await db.query(firstQuery, [trendingId, postId]);
+        await db.query(secondQuery, [trendingId]);
+    }
 }
 
 export default new TrendingsRepository();

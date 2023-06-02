@@ -89,13 +89,16 @@ class PostRepository {
         COUNT(l.id) AS total_likes, 
                 ARRAY(
                     SELECT unnest(array_agg(u.username)) 
-                    FROM unnest(array_agg(u.username)) 
+                    FROM likes ll
+                    JOIN users u ON ll.user_id = u.id
+                    WHERE ll.post_id = p.id
+                    ORDER BY RANDOM()
                     LIMIT 2
-                ) AS liked_users,
+                    ) AS liked_users,
                 EXISTS (
                     SELECT 1 
                     FROM likes 
-                    WHERE user_id = 1 
+                    WHERE user_id = 1
                     AND post_id = p.id
                 ) AS user_liked,
                 (
@@ -109,7 +112,8 @@ class PostRepository {
         LEFT JOIN likes l ON l.post_id = p.id
         LEFT JOIN users u ON l.user_id = u.id
         WHERE t.name ILIKE $1
-        GROUP BY p.id, u.username;`;
+        GROUP BY p.id, u.username
+        ORDER BY p.createdat DESC LIMIT 20`;
 
         return db.query(query, [
             hashTag
@@ -130,7 +134,14 @@ class PostRepository {
         return db.query(query, [id]);
     }
 
+    update(description, id) {
+        const query = `
+            UPDATE posts SET description=$1 WHERE id = $2;;
+        `;
+        return db.query(query, [description, id]);
+    }
+
 
 }
 
-export default new PostRepository;
+export default new PostRepository;;
