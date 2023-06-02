@@ -9,3 +9,8 @@ export const postSchema = Joi.object({
 export const UpdatePostSchema = Joi.object({
   description: Joi.string().required()
 });
+
+export const likeSchema = Joi.object({
+  user_id: Joi.number().integer().required(),
+  post_id: Joi.number().integer().required()
+});
