@@ -41,3 +41,14 @@ export async function getPostsByHashtag(req, res) {
     res.status(500).json(err.message);
   }
 }
+
+export async function deletePost(req, res) {
+  const { id } = req.params;
+
+  try {
+    PostsRepository.deletePost(id)
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+}

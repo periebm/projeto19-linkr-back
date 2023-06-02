@@ -56,6 +56,21 @@ class PostRepository {
             hashTag
         ]);
     }
+
+    getPostsbyIdDB(id) {
+        const query = `
+            SELECT * FROM posts WHERE id=$1;`;
+
+        return db.query(query, [id]);
+    }
+
+    deletePost(id) {
+        const query = `
+            DELETE FROM posts WHERE id=$1;`;
+
+        return db.query(query, [id]);
+    }
+
 }
 
 export default new PostRepository;
