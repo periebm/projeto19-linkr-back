@@ -23,7 +23,7 @@ export default class AuthControllers {
     try {
       const data = { id: userId, pictureUrl };
       const token = jwt.sign(data, secretKey);
-      res.status(200).send({ token });
+      res.status(200).send({ token, ...data });
     } catch (err) {
       res.status(500).send(err.message);
     }
