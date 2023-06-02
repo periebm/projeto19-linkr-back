@@ -5,7 +5,6 @@ export async function validatePostUser(req, res, next) {
 
   try {
     const post = await PostsRepository.getPostsbyIdDB(id);
-
     if (post.rows[0].user_id !== res.locals.session.rows[0].id) return res.sendStatus(405);
 
     next();
