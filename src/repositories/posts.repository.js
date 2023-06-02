@@ -71,6 +71,13 @@ class PostRepository {
         return db.query(query, [id]);
     }
 
+    update(description, id) {
+        const query = `
+            UPDATE posts SET description=$1 WHERE id = $2;;
+        `;
+        return db.query(query, [description, id]);
+    }
+
 }
 
-export default new PostRepository;
+export default new PostRepository;;

@@ -5,3 +5,7 @@ export const postSchema = Joi.object({
   user_id: Joi.number().integer().required(),
   url: Joi.string().required().uri()
 });
+
+export const UpdatePostSchema = Joi.object({
+  description: Joi.string().required()
+});

@@ -46,7 +46,19 @@ export async function deletePost(req, res) {
   const { id } = req.params;
 
   try {
-    PostsRepository.deletePost(id)
+    PostsRepository.deletePost(id);
+    res.sendStatus(200);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+}
+
+export async function updatePost(req, res) {
+  const { id } = req.params;
+  const { description } = req.body;
+
+  try {
+    PostsRepository.update(description, id);
     res.sendStatus(200);
   } catch (err) {
     res.status(500).json(err.message);
