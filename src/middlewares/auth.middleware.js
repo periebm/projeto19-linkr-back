@@ -38,7 +38,7 @@ export async function loginValidate(req, res, next) {
     if (!isValidPassword) return res.sendStatus(401);
 
     res.locals.userId = user.userId;
-    res.locals.pictureUrl = user.picture_url
+    res.locals.pictureUrl = user.picture_url;
     next();
   } catch (err) {
     res.status(500).send(err.message);
