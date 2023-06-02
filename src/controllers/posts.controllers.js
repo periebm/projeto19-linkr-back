@@ -4,7 +4,8 @@ import TrendingsRepository from "../repositories/trendings.repository.js";
 
 export async function getPosts(req, res) {
   try {
-    const posts = await PostsRepository.getPosts();
+    const user_id = res.locals.userId
+    const posts = await PostsRepository.getPosts(user_id);
     res.status(200).send(posts.rows);
   } catch (err) {
     res.status(500).json(err.message);
@@ -26,6 +27,32 @@ export async function createPost(req, res) {
     }
 
     res.status(201).json({ message: 'Post criado' });
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+}
+
+export async function likePost(req, res){
+  const {user_id, post_id} = req.body
+  try {
+    const data = await PostsRepository.checkLike(user_id, post_id)
+    if(data.rows.length !== 0) return res.status(409).send("Usuario ja deu like nesse post")
+
+    await PostsRepository.likePost(user_id, post_id)
+    res.status(201).json({message: 'Like adicionado'})
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+}
+
+export async function deleteLike(req, res){
+  const {user_id, post_id} = req.body
+  try {
+    const data = await PostsRepository.checkLike(user_id, post_id)
+    if(data.rows.length !== 1) return res.status(409).send("Usuario nao deu like nesse post")
+
+    await PostsRepository.deleteLike(user_id, post_id)
+    res.status(200).json({message: 'Like deletado'})
   } catch (err) {
     res.status(500).json(err.message);
   }

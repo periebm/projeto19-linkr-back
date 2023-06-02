@@ -1,37 +1,33 @@
 import { db } from "../database/db.connection.js";
 
 class PostRepository {
-    getPosts() {
+    getPosts(user_id) {
         const query = ` SELECT p.*, 
-        COUNT(l.id) AS total_likes, 
-                ARRAY(
-                    SELECT unnest(array_agg(u.username)) 
-                    FROM likes ll
-                    JOIN users u ON ll.user_id = u.id
-                    WHERE ll.post_id = p.id
-                    ORDER BY RANDOM()
-                    LIMIT 2
-                ) AS liked_users,
-                EXISTS (
-                    SELECT 1 
-                    FROM likes 
-                    WHERE user_id = 1
-                    AND post_id = p.id
-                ) AS user_liked,
-                (
-                    SELECT json_build_object('username', username, 'picture', picture_url) 
-                    FROM users 
-                    WHERE p.user_id = users.id
-                ) AS author
-        FROM posts p
-        LEFT JOIN trending_posts tr ON p.id = tr.post_id
-        LEFT JOIN likes l ON l.post_id = p.id
-        LEFT JOIN users u ON l.user_id = u.id
-        GROUP BY p.id, u.username
-        ORDER BY p.createdat DESC LIMIT 20
+        COUNT(l.post_id) AS total_likes, 
+        ARRAY_AGG(u.username) AS liked_users,
+        EXISTS (
+            SELECT 1 
+            FROM likes 
+            WHERE user_id = $1
+            AND post_id = p.id
+            LIMIT 1
+        ) AS user_liked,
+        (
+            SELECT jsonb_build_object('username', username, 'picture', picture_url) 
+            FROM users 
+            WHERE p.user_id = users.id
+        ) AS author
+    FROM posts p
+    LEFT JOIN trending_posts tr ON p.id = tr.post_id
+    LEFT JOIN likes l ON p.id = l.post_id
+    LEFT JOIN users u ON l.user_id = u.id
+    GROUP BY p.id, p.url, author
+    ORDER BY p.createdat DESC 
+    LIMIT 20
+        
         `;
 
-        return db.query(query);
+        return db.query(query, [user_id]);
     }
 
     createPost(user_id, description, url) {
@@ -46,6 +42,45 @@ class PostRepository {
             description,
             url
         ]);
+    }
+
+    likePost(user_id, post_id) {
+        const query = `
+        INSERT INTO
+        likes (user_id, post_id)
+        VALUES ($1, $2)
+        `;
+
+        return db.query(query, [
+            user_id,
+            post_id
+        ])
+    }
+
+    deleteLike(user_id, post_id) {
+        const query = `
+        DELETE 
+        FROM likes 
+        WHERE user_id=$1 
+        AND post_id=$2
+        `;
+        return db.query(query, [
+            user_id,
+            post_id
+        ])
+    }
+
+    checkLike(user_id, post_id) {
+        const query = `
+        SELECT * 
+        FROM likes
+        WHERE user_id=$1 
+        AND post_id=$2 
+        `;
+        return db.query(query, [
+            user_id,
+            post_id
+        ])
     }
 
     getPostsByHashTag(hashTag) {
