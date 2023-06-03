@@ -54,7 +54,7 @@ class PostRepository {
         return db.query(query, [
             user_id,
             post_id
-        ])
+        ]);
     }
 
     deleteLike(user_id, post_id) {
@@ -67,7 +67,7 @@ class PostRepository {
         return db.query(query, [
             user_id,
             post_id
-        ])
+        ]);
     }
 
     checkLike(user_id, post_id) {
@@ -80,10 +80,10 @@ class PostRepository {
         return db.query(query, [
             user_id,
             post_id
-        ])
+        ]);
     }
 
-    getPostsByHashTag(hashTag) {
+    getPostsByHashTag(hashTag, user_id) {
         const query = `
         SELECT p.*, 
         COUNT(l.id) AS total_likes, 
@@ -98,7 +98,7 @@ class PostRepository {
                 EXISTS (
                     SELECT 1 
                     FROM likes 
-                    WHERE user_id = 1
+                    WHERE user_id = $1
                     AND post_id = p.id
                 ) AS user_liked,
                 (
@@ -111,11 +111,12 @@ class PostRepository {
         JOIN trendings t ON t.id = tr.trending_id
         LEFT JOIN likes l ON l.post_id = p.id
         LEFT JOIN users u ON l.user_id = u.id
-        WHERE t.name ILIKE $1
+        WHERE t.name ILIKE $2
         GROUP BY p.id, u.username
         ORDER BY p.createdat DESC LIMIT 20`;
 
         return db.query(query, [
+            user_id,
             hashTag
         ]);
     }

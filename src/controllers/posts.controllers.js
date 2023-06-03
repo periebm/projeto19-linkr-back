@@ -60,9 +60,9 @@ export async function deleteLike(req, res){
 
 export async function getPostsByHashtag(req, res) {
   const { hashtag } = req.params;
-
+  const user_id = res.locals.userId
   try {
-    const { rows } = await PostsRepository.getPostsByHashTag(hashtag);
+    const { rows } = await PostsRepository.getPostsByHashTag(hashtag, user_id);
     res.status(200).send(rows);
   } catch (err) {
     res.status(500).json(err.message);
@@ -87,20 +87,20 @@ export async function updatePost(req, res) {
   const hashtags = extractHashtags(description);
 
   try {
-    if (hashtags.length > 0) {
-      const { rows } = await TrendingsRepository.getTrendingIdByPost(id);
 
-      rows.forEach(async (row) => {
-        if (!hashtags.includes(row.name)) {
-          await TrendingsRepository.deleteTrendingById(row.trending_id, id);
-        }
-      });
+    const { rows } = await TrendingsRepository.getTrendingIdByPost(id);
 
-      for (let i = 0; i < hashtags.length; i++) {
-        await TrendingsRepository.createTrending(hashtags[i], id);
+    rows.forEach(async (row) => {
+      if (!hashtags.includes(row.name)) {
+        await TrendingsRepository.deleteTrendingById(row.trending_id, id);
       }
+    });
 
+    for (let i = 0; i < hashtags.length; i++) {
+      await TrendingsRepository.createTrending(hashtags[i], id);
     }
+
+
     PostsRepository.update(description, id);
     res.sendStatus(200);
   } catch (err) {

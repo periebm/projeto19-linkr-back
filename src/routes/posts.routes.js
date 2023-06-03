@@ -8,7 +8,7 @@ import { validatePostUser } from "../middlewares/posts.middleware.js";
 const postsRouter = Router();
 
 postsRouter.get("/posts", authValidate, getPosts);
-postsRouter.get("/posts/:hashtag", getPostsByHashtag);
+postsRouter.get("/posts/:hashtag", authValidate, getPostsByHashtag);
 postsRouter.post("/posts", authValidate, validateSchema(postSchema), createPost);
 postsRouter.delete("/delete/:id", authValidate, validatePostUser, deletePost);
 postsRouter.put("/posts/update/:id", authValidate, validateSchema(UpdatePostSchema), validatePostUser, updatePost);

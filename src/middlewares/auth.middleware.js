@@ -7,7 +7,6 @@ import { compareSync } from "bcrypt";
 export async function authValidate(req, res, next) {
   const { authorization } = req.headers;
   const token = authorization?.replace("Bearer ", "");
-  console.log(token)
   if (!token) return res.sendStatus(401);
 
   dotenv.config();
@@ -19,8 +18,7 @@ export async function authValidate(req, res, next) {
     const session = await db.query(`SELECT * FROM users WHERE id=$1`, [data.id]);
     if (session.rows.length === 0) return res.status(401).send("Sessao nao encontrada");
     res.locals.session = session;
-    console.log(session.rows)
-    res.locals.userId = session.rows[0].id
+    res.locals.userId = session.rows[0].id;
 
     next();
   } catch (err) {
@@ -41,7 +39,7 @@ export async function loginValidate(req, res, next) {
     if (!isValidPassword) return res.sendStatus(401);
 
     res.locals.userId = user.userId;
-    res.locals.pictureUrl = user.picture_url
+    res.locals.pictureUrl = user.picture_url;
     next();
   } catch (err) {
     res.status(500).send(err.message);
