@@ -11,7 +11,7 @@ export async function findUserForLogin(email) {
   return (
     (
       await db.query(
-        `SELECT id AS "userId", password AS "hashedPassword", picture_url FROM users WHERE $1 = users.email`,
+        `SELECT id AS "userId", password AS "hashedPassword", picture_url, username FROM users WHERE $1 = users.email`,
         [email]
       )
     )?.rows[0] || null
