@@ -24,7 +24,6 @@ class PostRepository {
     GROUP BY p.id, p.url, author
     ORDER BY p.createdat DESC 
     LIMIT 20
-        
         `;
 
         return db.query(query, [user_id]);
@@ -122,8 +121,32 @@ class PostRepository {
     }
 
     getPostsbyIdDB(id) {
-        const query = `
-            SELECT * FROM posts WHERE id=$1;`;
+        const query = ` SELECT u.username,
+        p.*,
+        COUNT(l.post_id) AS total_likes, 
+        ARRAY_AGG(u_liked.username) AS liked_users,
+        EXISTS (
+            SELECT 1 
+            FROM likes 
+            WHERE user_id = $1
+            AND post_id = p.id
+            LIMIT 1
+        ) AS user_liked,
+        (
+            SELECT jsonb_build_object('username', username, 'picture', picture_url) 
+            FROM users 
+            WHERE p.user_id = users.id
+        ) AS author
+    FROM users u
+    LEFT JOIN posts p ON u.id = p.user_id
+    LEFT JOIN likes l ON p.id = l.post_id
+    LEFT JOIN users u_liked ON l.user_id = u_liked.id
+    LEFT JOIN trending_posts tr ON p.id = tr.post_id
+    WHERE u.id = $1
+    GROUP BY u.id, u.username, p.id, p.url, author
+    ORDER BY p.createdat DESC 
+    LIMIT 20;
+        `;
 
         return db.query(query, [id]);
     }
@@ -141,7 +164,6 @@ class PostRepository {
         `;
         return db.query(query, [description, id]);
     }
-
 
 }
 
