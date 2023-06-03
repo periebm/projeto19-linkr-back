@@ -107,3 +107,14 @@ export async function updatePost(req, res) {
     res.status(500).json(err.message);
   }
 }
+
+export async function getPostsById(req, res) {
+  const { id } = req.params;
+  try {
+    const user_id = res.locals.userId
+    const posts = await PostsRepository.getPostsbyIdDB(id);
+    res.status(200).send(posts.rows);
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+}
