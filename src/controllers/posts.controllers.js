@@ -60,9 +60,9 @@ export async function deleteLike(req, res){
 
 export async function getPostsByHashtag(req, res) {
   const { hashtag } = req.params;
-
+  const user_id = res.locals.userId
   try {
-    const { rows } = await PostsRepository.getPostsByHashTag(hashtag);
+    const { rows } = await PostsRepository.getPostsByHashTag(hashtag, user_id);
     res.status(200).send(rows);
   } catch (err) {
     res.status(500).json(err.message);
