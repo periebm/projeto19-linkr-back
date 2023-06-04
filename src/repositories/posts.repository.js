@@ -151,12 +151,35 @@ class PostRepository {
         return db.query(query, [id]);
     }
 
+    getOnePostByIdDB(id) {
+        const query = `
+            SELECT * FROM posts WHERE id=$1;
+        `;
+
+        return db.query(query, [id]);
+    }
+
     deletePost(id) {
         const query = `
             DELETE FROM posts WHERE id=$1;`;
 
         return db.query(query, [id]);
     }
+
+    deletePostLikes(id) {
+        const query = `
+            DELETE FROM likes WHERE post_id=$1;`;
+
+        return db.query(query, [id]);
+    }
+
+    deletePostTrendings(id){
+        const query = `
+            DELETE FROM trending_posts WHERE post_id =$1;`;
+
+        return db.query(query, [id]);
+    }
+    
 
     update(description, id) {
         const query = `
