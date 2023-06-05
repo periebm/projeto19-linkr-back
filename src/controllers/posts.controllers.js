@@ -73,10 +73,12 @@ export async function deletePost(req, res) {
   const { id } = req.params;
 
   try {
+    PostsRepository.deletePostLikes(id);
+    PostsRepository.deletePostTrendings(id);
     PostsRepository.deletePost(id);
     res.sendStatus(200);
   } catch (err) {
-    res.status(500).json(err.message);
+    res.status(500).send(err.message);
   }
 }
 
