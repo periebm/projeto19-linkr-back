@@ -2,28 +2,76 @@ import { db } from "../database/db.connection.js";
 
 class PostRepository {
     getPosts(user_id) {
-        const query = ` SELECT p.*, 
-        COUNT(l.post_id) AS total_likes, 
-        ARRAY_AGG(u.username) AS liked_users,
-        EXISTS (
-            SELECT 1 
-            FROM likes 
-            WHERE user_id = $1
-            AND post_id = p.id
-            LIMIT 1
-        ) AS user_liked,
-        (
-            SELECT jsonb_build_object('username', username, 'picture', picture_url) 
-            FROM users 
-            WHERE p.user_id = users.id
-        ) AS author
-    FROM posts p
-    LEFT JOIN trending_posts tr ON p.id = tr.post_id
-    LEFT JOIN likes l ON p.id = l.post_id
-    LEFT JOIN users u ON l.user_id = u.id
-    GROUP BY p.id, p.url, author
-    ORDER BY p.createdat DESC 
-    LIMIT 20
+        const query = ` 
+        SELECT * 
+		FROM (SELECT p.id, 
+            p.user_id,
+		p.description,
+		  p.url,
+			  p.createdat,
+    COUNT(l.post_id) AS total_likes, 
+	CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
+    ARRAY_AGG(u.username) AS liked_users,
+    EXISTS (
+        SELECT 1 
+        FROM likes 
+        WHERE user_id = $1
+        AND post_id = p.id
+        LIMIT 1
+    ) AS user_liked,
+    (
+        SELECT jsonb_build_object('username', username, 'picture', picture_url) 
+        FROM users 
+        WHERE p.user_id = users.id
+    ) AS author,
+			  
+			  NULL AS reposted_by
+			  
+FROM posts p
+LEFT JOIN trending_posts tr ON p.id = tr.post_id
+LEFT JOIN likes l ON p.id = l.post_id
+LEFT JOIN users u ON l.user_id = u.id
+LEFT JOIN reposts r ON r.post_id = p.id
+JOIN follows f ON f.followed_id = p.user_id
+WHERE f.user_id = $1
+GROUP BY p.id, p.url, author
+
+UNION
+
+SELECT p.id,
+        p.user_id,
+		p.description,
+		  p.url,
+			  r.createdat,
+    COUNT(l.post_id) AS total_likes,
+	CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
+    ARRAY_AGG(u.username) AS liked_users,
+    EXISTS (
+        SELECT 1 
+        FROM likes 
+        WHERE user_id = $1
+        AND post_id = p.id
+        LIMIT 1
+    ) AS user_liked,
+    (
+        SELECT jsonb_build_object('username', username, 'picture', picture_url) 
+        FROM users 
+        WHERE p.user_id = users.id
+    ) AS author,
+			  
+	    (SELECT jsonb_build_object('username', username, 'id', id) 
+        FROM users 
+        WHERE r.user_id = users.id) AS reposted_by
+			  
+FROM posts p
+JOIN reposts r ON r.post_id = p.id
+JOIN follows f ON r.user_id = f.followed_id
+LEFT JOIN likes l ON p.id = l.post_id
+LEFT JOIN users u ON l.user_id = u.id
+WHERE f.user_id = $1
+GROUP BY p.id,r.user_id, p.url, r.createdat,author) AS subquery
+ORDER BY subquery.createdat DESC 
+LIMIT 20
         `;
 
         return db.query(query, [user_id]);
