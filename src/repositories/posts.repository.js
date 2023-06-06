@@ -33,7 +33,7 @@ class PostRepository {
         LEFT JOIN likes l ON p.id = l.post_id
         LEFT JOIN users u ON l.user_id = u.id
         LEFT JOIN reposts r ON r.post_id = p.id
-        JOIN follows f ON f.following_id = p.user_id
+        JOIN followers f ON f.following_id = p.user_id
         WHERE f.follower_id = $1
         GROUP BY p.id, p.url, author
 
@@ -64,7 +64,7 @@ class PostRepository {
 			  
         FROM posts p
         JOIN reposts r ON r.post_id = p.id
-        JOIN follows f ON r.user_id = f.following_id
+        JOIN followers f ON r.user_id = f.following_id
         LEFT JOIN likes l ON p.id = l.post_id
         LEFT JOIN users u ON l.user_id = u.id
         WHERE f.follower_id = $1
