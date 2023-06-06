@@ -7,10 +7,10 @@ class PostRepository {
         COUNT(likes.post_id) AS total_likes,
         ARRAY_AGG(users.username) AS liked_users
         FROM
-        (SELECT p.id, 
+        (SELECT p.id,
             p.user_id,
-		p.description,
-		  p.url,
+		    p.description,
+		    p.url,
 			  p.createdat,
 	    CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
         EXISTS (
@@ -33,8 +33,8 @@ class PostRepository {
         LEFT JOIN likes l ON p.id = l.post_id
         LEFT JOIN users u ON l.user_id = u.id
         LEFT JOIN reposts r ON r.post_id = p.id
-        JOIN follows f ON f.followed_id = p.user_id
-        WHERE f.user_id = $1
+        JOIN follows f ON f.following_id = p.user_id
+        WHERE f.follower_id = $1
         GROUP BY p.id, p.url, author
 
     UNION
@@ -64,10 +64,10 @@ class PostRepository {
 			  
         FROM posts p
         JOIN reposts r ON r.post_id = p.id
-        JOIN follows f ON r.user_id = f.followed_id
+        JOIN follows f ON r.user_id = f.following_id
         LEFT JOIN likes l ON p.id = l.post_id
         LEFT JOIN users u ON l.user_id = u.id
-        WHERE f.user_id = $1
+        WHERE f.follower_id = $1
         GROUP BY p.id,r.user_id, p.url, r.createdat,author
         )
         AS subquery
