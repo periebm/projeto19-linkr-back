@@ -2,10 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.2
--- Dumped by pg_dump version 15.2
-
--- Started on 2023-06-05 14:28:58
+-- Dumped from database version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
+-- Dumped by pg_dump version 14.8 (Ubuntu 14.8-0ubuntu0.22.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -23,7 +21,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 221 (class 1259 OID 49191)
 -- Name: likes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -36,7 +33,6 @@ CREATE TABLE public.likes (
 
 
 --
--- TOC entry 220 (class 1259 OID 49190)
 -- Name: likes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -50,8 +46,6 @@ CREATE SEQUENCE public.likes_id_seq
 
 
 --
--- TOC entry 3367 (class 0 OID 0)
--- Dependencies: 220
 -- Name: likes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -59,7 +53,6 @@ ALTER SEQUENCE public.likes_id_seq OWNED BY public.likes.id;
 
 
 --
--- TOC entry 217 (class 1259 OID 49166)
 -- Name: posts; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -73,7 +66,6 @@ CREATE TABLE public.posts (
 
 
 --
--- TOC entry 216 (class 1259 OID 49165)
 -- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -87,8 +79,6 @@ CREATE SEQUENCE public.posts_id_seq
 
 
 --
--- TOC entry 3368 (class 0 OID 0)
--- Dependencies: 216
 -- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -96,7 +86,6 @@ ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
 
 
 --
--- TOC entry 223 (class 1259 OID 49209)
 -- Name: trending_posts; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -109,7 +98,6 @@ CREATE TABLE public.trending_posts (
 
 
 --
--- TOC entry 222 (class 1259 OID 49208)
 -- Name: trending_posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -123,8 +111,6 @@ CREATE SEQUENCE public.trending_posts_id_seq
 
 
 --
--- TOC entry 3369 (class 0 OID 0)
--- Dependencies: 222
 -- Name: trending_posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -132,7 +118,6 @@ ALTER SEQUENCE public.trending_posts_id_seq OWNED BY public.trending_posts.id;
 
 
 --
--- TOC entry 219 (class 1259 OID 49181)
 -- Name: trendings; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -144,7 +129,6 @@ CREATE TABLE public.trendings (
 
 
 --
--- TOC entry 218 (class 1259 OID 49180)
 -- Name: trendings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -158,8 +142,6 @@ CREATE SEQUENCE public.trendings_id_seq
 
 
 --
--- TOC entry 3370 (class 0 OID 0)
--- Dependencies: 218
 -- Name: trendings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -167,7 +149,6 @@ ALTER SEQUENCE public.trendings_id_seq OWNED BY public.trendings.id;
 
 
 --
--- TOC entry 215 (class 1259 OID 49154)
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -182,7 +163,6 @@ CREATE TABLE public.users (
 
 
 --
--- TOC entry 214 (class 1259 OID 49153)
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -196,8 +176,6 @@ CREATE SEQUENCE public.users_id_seq
 
 
 --
--- TOC entry 3371 (class 0 OID 0)
--- Dependencies: 214
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
@@ -205,7 +183,6 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
--- TOC entry 3199 (class 2604 OID 49194)
 -- Name: likes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -213,7 +190,6 @@ ALTER TABLE ONLY public.likes ALTER COLUMN id SET DEFAULT nextval('public.likes_
 
 
 --
--- TOC entry 3195 (class 2604 OID 49169)
 -- Name: posts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -221,7 +197,6 @@ ALTER TABLE ONLY public.posts ALTER COLUMN id SET DEFAULT nextval('public.posts_
 
 
 --
--- TOC entry 3201 (class 2604 OID 49212)
 -- Name: trending_posts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -229,7 +204,6 @@ ALTER TABLE ONLY public.trending_posts ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- TOC entry 3197 (class 2604 OID 49184)
 -- Name: trendings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -237,7 +211,6 @@ ALTER TABLE ONLY public.trendings ALTER COLUMN id SET DEFAULT nextval('public.tr
 
 
 --
--- TOC entry 3193 (class 2604 OID 49157)
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -245,7 +218,71 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
--- TOC entry 3212 (class 2606 OID 49197)
+-- Data for Name: likes; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- Data for Name: trending_posts; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- Data for Name: trendings; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+
+
+--
+-- Name: likes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.likes_id_seq', 1, false);
+
+
+--
+-- Name: posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.posts_id_seq', 1, false);
+
+
+--
+-- Name: trending_posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.trending_posts_id_seq', 1, false);
+
+
+--
+-- Name: trendings_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.trendings_id_seq', 1, false);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 1, false);
+
+
+--
 -- Name: likes likes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -254,7 +291,6 @@ ALTER TABLE ONLY public.likes
 
 
 --
--- TOC entry 3208 (class 2606 OID 49174)
 -- Name: posts posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -263,7 +299,6 @@ ALTER TABLE ONLY public.posts
 
 
 --
--- TOC entry 3214 (class 2606 OID 49215)
 -- Name: trending_posts trending_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -272,7 +307,6 @@ ALTER TABLE ONLY public.trending_posts
 
 
 --
--- TOC entry 3210 (class 2606 OID 49189)
 -- Name: trendings trendings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -281,7 +315,6 @@ ALTER TABLE ONLY public.trendings
 
 
 --
--- TOC entry 3204 (class 2606 OID 49164)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -290,7 +323,6 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3206 (class 2606 OID 49162)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -299,7 +331,22 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 3216 (class 2606 OID 49203)
+-- Name: trending_posts fk_trending_posts_post_id; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.trending_posts
+    ADD CONSTRAINT fk_trending_posts_post_id FOREIGN KEY (post_id) REFERENCES public.posts(id) ON DELETE CASCADE;
+
+
+--
+-- Name: trending_posts fk_trending_posts_trending_id; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.trending_posts
+    ADD CONSTRAINT fk_trending_posts_trending_id FOREIGN KEY (trending_id) REFERENCES public.trendings(id) ON DELETE CASCADE;
+
+
+--
 -- Name: likes likes_post_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -308,7 +355,6 @@ ALTER TABLE ONLY public.likes
 
 
 --
--- TOC entry 3217 (class 2606 OID 49198)
 -- Name: likes likes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -317,7 +363,6 @@ ALTER TABLE ONLY public.likes
 
 
 --
--- TOC entry 3215 (class 2606 OID 49175)
 -- Name: posts posts_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -326,7 +371,6 @@ ALTER TABLE ONLY public.posts
 
 
 --
--- TOC entry 3218 (class 2606 OID 49221)
 -- Name: trending_posts trending_posts_post_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -335,15 +379,12 @@ ALTER TABLE ONLY public.trending_posts
 
 
 --
--- TOC entry 3219 (class 2606 OID 49216)
 -- Name: trending_posts trending_posts_trending_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.trending_posts
     ADD CONSTRAINT trending_posts_trending_id_fkey FOREIGN KEY (trending_id) REFERENCES public.trendings(id);
 
-
--- Completed on 2023-06-05 14:28:59
 
 --
 -- PostgreSQL database dump complete
