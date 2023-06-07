@@ -4,8 +4,11 @@ import TrendingsRepository from "../repositories/trendings.repository.js";
 
 export async function getPosts(req, res) {
   try {
+    const offset = req.query.offset
+    const limit = req.query.limit
     const user_id = res.locals.userId
-    const posts = await PostsRepository.getPosts(user_id);
+    console.log(offset)
+    const posts = await PostsRepository.getPosts(user_id, offset, limit);
     res.status(200).send(posts.rows);
   } catch (err) {
     res.status(500).json(err.message);
