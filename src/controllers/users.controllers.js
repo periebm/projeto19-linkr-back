@@ -35,7 +35,7 @@ export async function followUser(req, res) {
 export async function getFollows(req, res) {
 
     try {
-        const follows = await getFollowsDB();
+        const follows = await getFollowsDB(res.locals.userId);
         res.send(follows.rows);
     } catch (err) {
         res.status(500).send(err.message)

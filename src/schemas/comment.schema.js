@@ -1,4 +1,4 @@
-import Joi from "Joi";
+import Joi from "joi";
 
 const commentSchema = Joi.object({
     postId: Joi.number().integer().required(),

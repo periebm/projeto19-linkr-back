@@ -60,8 +60,13 @@ export async function followUserDB(follower, following) {
   `, [follower, following])
 }
 
-export async function getFollowsDB() {
+export async function getFollowsDB(id) {
   return db.query(`
-  SELECT * FROM followers
-  `)
+  SELECT EXISTS (
+    SELECT 1
+    FROM followers
+    WHERE follower_id = $1
+)
+  AS is_following_anyone;
+  `, [id])
 }
