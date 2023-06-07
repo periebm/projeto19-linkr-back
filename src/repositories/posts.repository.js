@@ -25,6 +25,9 @@ class PostRepository {
         FROM users 
         WHERE p.user_id = users.id
         ) AS author,
+        (
+            SELECT COUNT(*) from comments c WHERE c.post_id = p.id
+        ) AS total_comments,
 			  
 			  NULL AS reposted_by
 			  
@@ -33,7 +36,7 @@ class PostRepository {
         LEFT JOIN likes l ON p.id = l.post_id
         LEFT JOIN users u ON l.user_id = u.id
         LEFT JOIN reposts r ON r.post_id = p.id
-        JOIN follows f ON f.following_id = p.user_id
+        JOIN followers f ON f.following_id = p.user_id
         WHERE f.follower_id = $1
         GROUP BY p.id, p.url, author
 
@@ -57,6 +60,9 @@ class PostRepository {
         FROM users 
         WHERE p.user_id = users.id
         ) AS author,
+        (
+            SELECT COUNT(*) from comments c WHERE c.post_id = p.id
+        ) AS total_comments,
 			  
 	    (SELECT jsonb_build_object('username', username, 'id', id) 
         FROM users 
@@ -64,7 +70,7 @@ class PostRepository {
 			  
         FROM posts p
         JOIN reposts r ON r.post_id = p.id
-        JOIN follows f ON r.user_id = f.following_id
+        JOIN followers f ON r.user_id = f.following_id
         LEFT JOIN likes l ON p.id = l.post_id
         LEFT JOIN users u ON l.user_id = u.id
         WHERE f.follower_id = $1
@@ -73,7 +79,9 @@ class PostRepository {
         AS subquery
         LEFT JOIN likes ON likes.post_id = subquery.id
         LEFT JOIN users ON likes.user_id = users.id
-        GROUP BY subquery.id, subquery.user_id, subquery.description, subquery.url, subquery.createdat, subquery.total_reposts, subquery.user_liked, subquery.author, subquery.reposted_by
+        GROUP BY subquery.id, subquery.user_id, subquery.description, subquery.url, subquery.createdat, 
+        subquery.total_reposts, subquery.user_liked, subquery.author, subquery.reposted_by,
+        subquery.total_comments
         ORDER BY subquery.createdat DESC 
         LIMIT 20
         `;
@@ -156,10 +164,12 @@ class PostRepository {
                     SELECT json_build_object('username', username, 'picture', picture_url) 
                     FROM users 
                     WHERE p.user_id = users.id
-                ) AS author
+                ) AS author,
+                COUNT(c.id) AS total_comments
         FROM posts p
         JOIN trending_posts tr ON p.id = tr.post_id
         JOIN trendings t ON t.id = tr.trending_id
+        LEFT JOIN comments c ON c.post_id = p.id
         LEFT JOIN likes l ON l.post_id = p.id
         LEFT JOIN users u ON l.user_id = u.id
         WHERE t.name ILIKE $2
