@@ -1,7 +1,182 @@
 import { db } from "../database/db.connection.js";
 
 class PostRepository {
-    getPosts(user_id) {
+    getPosts(user_id, offset, limit) {
+        if(offset){
+            const query = ` 
+            SELECT subquery.*,
+            COUNT(likes.post_id) AS total_likes,
+            ARRAY_AGG(users.username) AS liked_users
+            FROM
+            (SELECT p.id,
+                p.user_id,
+                p.description,
+                p.url,
+                  p.createdat,
+            CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
+            EXISTS (
+            SELECT 1
+            FROM likes 
+            WHERE user_id = $1
+            AND post_id = p.id
+            LIMIT 1
+            ) AS user_liked,
+            (
+            SELECT jsonb_build_object('username', username, 'picture', picture_url) 
+            FROM users 
+            WHERE p.user_id = users.id
+            ) AS author,
+            (
+                SELECT COUNT(*) from comments c WHERE c.post_id = p.id
+            ) AS total_comments,
+                  
+                  NULL AS reposted_by
+                  
+            FROM posts p
+            LEFT JOIN trending_posts tr ON p.id = tr.post_id
+            LEFT JOIN likes l ON p.id = l.post_id
+            LEFT JOIN users u ON l.user_id = u.id
+            LEFT JOIN reposts r ON r.post_id = p.id
+            JOIN followers f ON f.following_id = p.user_id
+            WHERE f.follower_id = $1
+            GROUP BY p.id, p.url, author
+    
+        UNION
+    
+            SELECT p.id,
+            p.user_id,
+            p.description,
+              p.url,
+                  r.createdat,
+            CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
+            EXISTS (
+            SELECT 1 
+            FROM likes 
+            WHERE user_id = $1
+            AND post_id = p.id
+            LIMIT 1
+            ) AS user_liked,
+            (
+            SELECT jsonb_build_object('username', username, 'picture', picture_url) 
+            FROM users 
+            WHERE p.user_id = users.id
+            ) AS author,
+            (
+                SELECT COUNT(*) from comments c WHERE c.post_id = p.id
+            ) AS total_comments,
+                  
+            (SELECT jsonb_build_object('username', username, 'id', id) 
+            FROM users 
+            WHERE r.user_id = users.id) AS reposted_by
+                  
+            FROM posts p
+            JOIN reposts r ON r.post_id = p.id
+            JOIN followers f ON r.user_id = f.following_id
+            LEFT JOIN likes l ON p.id = l.post_id
+            LEFT JOIN users u ON l.user_id = u.id
+            WHERE f.follower_id = $1
+            GROUP BY p.id,r.user_id, p.url, r.createdat,author
+            )
+            AS subquery
+            LEFT JOIN likes ON likes.post_id = subquery.id
+            LEFT JOIN users ON likes.user_id = users.id
+            GROUP BY subquery.id, subquery.user_id, subquery.description, subquery.url, subquery.createdat, 
+            subquery.total_reposts, subquery.user_liked, subquery.author, subquery.reposted_by,
+            subquery.total_comments
+            ORDER BY subquery.createdat DESC 
+            LIMIT 10
+            OFFSET $2
+            `;
+    
+            return db.query(query, [user_id, offset]); 
+        }
+        if (limit){
+            const query = ` 
+        SELECT subquery.*,
+        COUNT(likes.post_id) AS total_likes,
+        ARRAY_AGG(users.username) AS liked_users
+        FROM
+        (SELECT p.id,
+            p.user_id,
+		    p.description,
+		    p.url,
+			  p.createdat,
+	    CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
+        EXISTS (
+        SELECT 1
+        FROM likes 
+        WHERE user_id = $1
+        AND post_id = p.id
+        LIMIT 1
+        ) AS user_liked,
+        (
+        SELECT jsonb_build_object('username', username, 'picture', picture_url) 
+        FROM users 
+        WHERE p.user_id = users.id
+        ) AS author,
+        (
+            SELECT COUNT(*) from comments c WHERE c.post_id = p.id
+        ) AS total_comments,
+			  
+			  NULL AS reposted_by
+			  
+        FROM posts p
+        LEFT JOIN trending_posts tr ON p.id = tr.post_id
+        LEFT JOIN likes l ON p.id = l.post_id
+        LEFT JOIN users u ON l.user_id = u.id
+        LEFT JOIN reposts r ON r.post_id = p.id
+        JOIN followers f ON f.following_id = p.user_id
+        WHERE f.follower_id = $1
+        GROUP BY p.id, p.url, author
+
+    UNION
+
+        SELECT p.id,
+        p.user_id,
+		p.description,
+		  p.url,
+			  r.createdat,
+        CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
+        EXISTS (
+        SELECT 1 
+        FROM likes 
+        WHERE user_id = $1
+        AND post_id = p.id
+        LIMIT 1
+        ) AS user_liked,
+        (
+        SELECT jsonb_build_object('username', username, 'picture', picture_url) 
+        FROM users 
+        WHERE p.user_id = users.id
+        ) AS author,
+        (
+            SELECT COUNT(*) from comments c WHERE c.post_id = p.id
+        ) AS total_comments,
+			  
+	    (SELECT jsonb_build_object('username', username, 'id', id) 
+        FROM users 
+        WHERE r.user_id = users.id) AS reposted_by
+			  
+        FROM posts p
+        JOIN reposts r ON r.post_id = p.id
+        JOIN followers f ON r.user_id = f.following_id
+        LEFT JOIN likes l ON p.id = l.post_id
+        LEFT JOIN users u ON l.user_id = u.id
+        WHERE f.follower_id = $1
+        GROUP BY p.id,r.user_id, p.url, r.createdat,author
+        )
+        AS subquery
+        LEFT JOIN likes ON likes.post_id = subquery.id
+        LEFT JOIN users ON likes.user_id = users.id
+        GROUP BY subquery.id, subquery.user_id, subquery.description, subquery.url, subquery.createdat, 
+        subquery.total_reposts, subquery.user_liked, subquery.author, subquery.reposted_by,
+        subquery.total_comments
+        ORDER BY subquery.createdat DESC 
+        LIMIT $2
+        `;
+
+        return db.query(query, [user_id, limit]);
+        }
         const query = ` 
         SELECT subquery.*,
         COUNT(likes.post_id) AS total_likes,
@@ -83,7 +258,6 @@ class PostRepository {
         subquery.total_reposts, subquery.user_liked, subquery.author, subquery.reposted_by,
         subquery.total_comments
         ORDER BY subquery.createdat DESC 
-        LIMIT 20
         `;
 
         return db.query(query, [user_id]);
