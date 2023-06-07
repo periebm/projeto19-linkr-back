@@ -18,16 +18,20 @@ export async function findUserForLogin(email) {
   );
 }
 
-export async function getUsersDB() {
+export async function getUsersDB(id) {
   return db.query(`
-        SELECT * FROM users
-      `)
+  SELECT u.*, 
+  CASE WHEN f.following_id IS NOT NULL THEN true ELSE false END AS is_following
+  FROM users u
+  LEFT JOIN followers f ON f.following_id = u.id AND f.follower_id = $1
+  ORDER BY CASE WHEN f.follower_id IS NOT NULL THEN 0 ELSE 1 END, u.username;
+      `, [id])
 }
 
 export async function getUserByIdDB(id) {
   return db.query(`
   SELECT * FROM users WHERE id=$1
-`,[id])
+`, [id])
 }
 
 export async function getAlreadyFollowingUserDB(follower, following) {
@@ -37,7 +41,7 @@ export async function getAlreadyFollowingUserDB(follower, following) {
     FROM followers 
     WHERE follower_id = $1 
     AND following_id = $2
-) AS is_following;`,[follower, following])
+) AS is_following;`, [follower, following])
 }
 
 export async function unfollowDB(follower, following) {
@@ -45,7 +49,7 @@ export async function unfollowDB(follower, following) {
   DELETE FROM followers 
   WHERE follower_id = $1 
   AND following_id = $2;
-  `,[follower, following])
+  `, [follower, following])
 }
 
 export async function followUserDB(follower, following) {
@@ -53,11 +57,16 @@ export async function followUserDB(follower, following) {
   INSERT INTO
   followers (follower_id, following_id)
   VALUES ($1, $2)
-  `,[follower, following])
+  `, [follower, following])
 }
 
-export async function getFollowsDB() {
+export async function getFollowsDB(id) {
   return db.query(`
-  SELECT * FROM followers
-  `)
+  SELECT EXISTS (
+    SELECT 1
+    FROM followers
+    WHERE follower_id = $1
+)
+  AS is_following_anyone;
+  `, [id])
 }

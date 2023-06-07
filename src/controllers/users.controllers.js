@@ -3,7 +3,7 @@ import { followUserDB, getAlreadyFollowingUserDB, getFollowsDB, getUsersDB, unfo
 export async function getUsers(req, res) {
 
     try {
-        const users = await getUsersDB();
+        const users = await getUsersDB(res.locals.userId);
         res.send(users.rows);
     } catch (err) {
         res.status(500).send(err.message)
@@ -35,7 +35,7 @@ export async function followUser(req, res) {
 export async function getFollows(req, res) {
 
     try {
-        const follows = await getFollowsDB();
+        const follows = await getFollowsDB(res.locals.userId);
         res.send(follows.rows);
     } catch (err) {
         res.status(500).send(err.message)
