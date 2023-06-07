@@ -8,7 +8,7 @@ import { validateFollows } from "../middlewares/users.middleware.js";
 
 const usersRouter = Router();
 
-usersRouter.get("/users", getUsers);
+usersRouter.get("/users",authValidate,  getUsers);
 usersRouter.get("/follow", getFollows);
 usersRouter.post("/follow", authValidate, validateSchema(followSchema), validateFollows, followUser);
 
