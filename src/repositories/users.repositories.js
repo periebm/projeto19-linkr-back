@@ -18,8 +18,46 @@ export async function findUserForLogin(email) {
   );
 }
 
-export async function getUsersDB(){
-    return db.query(`
+export async function getUsersDB() {
+  return db.query(`
         SELECT * FROM users
       `)
+}
+
+export async function getUserByIdDB(id) {
+  return db.query(`
+  SELECT * FROM users WHERE id=$1
+`,[id])
+}
+
+export async function getAlreadyFollowingUserDB(follower, following) {
+  return db.query(`
+    SELECT EXISTS (
+    SELECT 1 
+    FROM followers 
+    WHERE follower_id = $1 
+    AND following_id = $2
+) AS is_following;`,[follower, following])
+}
+
+export async function unfollowDB(follower, following) {
+  return db.query(`
+  DELETE FROM followers 
+  WHERE follower_id = $1 
+  AND following_id = $2;
+  `,[follower, following])
+}
+
+export async function followUserDB(follower, following) {
+  return db.query(`
+  INSERT INTO
+  followers (follower_id, following_id)
+  VALUES ($1, $2)
+  `,[follower, following])
+}
+
+export async function getFollowsDB() {
+  return db.query(`
+  SELECT * FROM followers
+  `)
 }

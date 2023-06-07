@@ -182,7 +182,7 @@ class PostRepository {
         ]);
     }
 
-    getPostsbyIdDB(id) {
+    getPostsbyIdDB(userId,id) {
         const query = ` SELECT u.username,
         p.*,
         COUNT(l.post_id) AS total_likes, 
@@ -194,6 +194,13 @@ class PostRepository {
             AND post_id = p.id
             LIMIT 1
         ) AS user_liked,
+        EXISTS (
+            SELECT 1 
+            FROM followers 
+            WHERE follower_id = $1
+            AND following_id = u.id
+            LIMIT 1
+        ) AS is_following,
         (
             SELECT jsonb_build_object('username', username, 'picture', picture_url) 
             FROM users 
@@ -204,13 +211,13 @@ class PostRepository {
     LEFT JOIN likes l ON p.id = l.post_id
     LEFT JOIN users u_liked ON l.user_id = u_liked.id
     LEFT JOIN trending_posts tr ON p.id = tr.post_id
-    WHERE u.id = $1
+    WHERE u.id = $2
     GROUP BY u.id, u.username, p.id, p.url, author
     ORDER BY p.createdat DESC 
     LIMIT 20;
         `;
 
-        return db.query(query, [id]);
+        return db.query(query, [userId, id]);
     }
 
     getOnePostByIdDB(id) {
