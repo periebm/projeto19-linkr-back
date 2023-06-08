@@ -2,7 +2,7 @@ import { db } from "../database/db.connection.js";
 
 class PostRepository {
     getPosts(user_id, offset, limit) {
-        if(offset){
+        if (offset) {
             const query = ` 
             SELECT subquery.*,
             COUNT(likes.post_id) AS total_likes,
@@ -87,10 +87,10 @@ class PostRepository {
             LIMIT 10
             OFFSET $2
             `;
-    
-            return db.query(query, [user_id, offset]); 
+
+            return db.query(query, [user_id, offset]);
         }
-        if (limit){
+        if (limit) {
             const query = ` 
         SELECT subquery.*,
         COUNT(likes.post_id) AS total_likes,
@@ -175,7 +175,7 @@ class PostRepository {
         LIMIT $2
         `;
 
-        return db.query(query, [user_id, limit]);
+            return db.query(query, [user_id, limit]);
         }
         const query = ` 
         SELECT subquery.*,
@@ -316,7 +316,47 @@ class PostRepository {
         ]);
     }
 
-    getPostsByHashTag(hashTag, user_id) {
+    getPostsByHashTag(hashTag, user_id, offset) {
+        if (offset) {
+            const query = `
+        SELECT p.*, 
+        COUNT(l.id) AS total_likes, 
+                ARRAY(
+                    SELECT unnest(array_agg(u.username)) 
+                    FROM likes ll
+                    JOIN users u ON ll.user_id = u.id
+                    WHERE ll.post_id = p.id
+                    ORDER BY RANDOM()
+                    LIMIT 2
+                    ) AS liked_users,
+                EXISTS (
+                    SELECT 1 
+                    FROM likes 
+                    WHERE user_id = $1
+                    AND post_id = p.id
+                ) AS user_liked,
+                (
+                    SELECT json_build_object('username', username, 'picture', picture_url) 
+                    FROM users 
+                    WHERE p.user_id = users.id
+                ) AS author,
+                COUNT(c.id) AS total_comments
+        FROM posts p
+        JOIN trending_posts tr ON p.id = tr.post_id
+        JOIN trendings t ON t.id = tr.trending_id
+        LEFT JOIN comments c ON c.post_id = p.id
+        LEFT JOIN likes l ON l.post_id = p.id
+        LEFT JOIN users u ON l.user_id = u.id
+        WHERE t.name ILIKE $2
+        GROUP BY p.id, u.username
+        ORDER BY p.createdat DESC LIMIT 10 OFFSET $3`;
+
+            return db.query(query, [
+                user_id,
+                hashTag,
+                offset
+            ]);
+        }
         const query = `
         SELECT p.*, 
         COUNT(l.id) AS total_likes, 
@@ -348,7 +388,7 @@ class PostRepository {
         LEFT JOIN users u ON l.user_id = u.id
         WHERE t.name ILIKE $2
         GROUP BY p.id, u.username
-        ORDER BY p.createdat DESC LIMIT 20`;
+        ORDER BY p.createdat DESC LIMIT 10`;
 
         return db.query(query, [
             user_id,
@@ -356,7 +396,45 @@ class PostRepository {
         ]);
     }
 
-    getPostsbyIdDB(userId,id) {
+    getPostsbyIdDB(userId, id, offset) {
+        if (offset) {
+            const query = ` SELECT u.username,
+        p.*,
+        COUNT(l.post_id) AS total_likes, 
+        ARRAY_AGG(u_liked.username) AS liked_users,
+        EXISTS (
+            SELECT 1 
+            FROM likes 
+            WHERE user_id = $1
+            AND post_id = p.id
+            LIMIT 1
+        ) AS user_liked,
+        EXISTS (
+            SELECT 1 
+            FROM followers 
+            WHERE follower_id = $1
+            AND following_id = u.id
+            LIMIT 1
+        ) AS is_following,
+        (
+            SELECT jsonb_build_object('username', username, 'picture', picture_url) 
+            FROM users 
+            WHERE p.user_id = users.id
+        ) AS author
+    FROM users u
+    LEFT JOIN posts p ON u.id = p.user_id
+    LEFT JOIN likes l ON p.id = l.post_id
+    LEFT JOIN users u_liked ON l.user_id = u_liked.id
+    LEFT JOIN trending_posts tr ON p.id = tr.post_id
+    WHERE u.id = $2
+    GROUP BY u.id, u.username, p.id, p.url, author
+    ORDER BY p.createdat DESC 
+    LIMIT 10
+    OFFSET $3;
+        `;
+
+            return db.query(query, [userId, id, offset]);
+        }
         const query = ` SELECT u.username,
         p.*,
         COUNT(l.post_id) AS total_likes, 
@@ -416,13 +494,13 @@ class PostRepository {
         return db.query(query, [id]);
     }
 
-    deletePostTrendings(id){
+    deletePostTrendings(id) {
         const query = `
             DELETE FROM trending_posts WHERE post_id =$1;`;
 
         return db.query(query, [id]);
     }
-    
+
 
     update(description, id) {
         const query = `
