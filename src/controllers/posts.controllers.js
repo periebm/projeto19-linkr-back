@@ -66,7 +66,6 @@ export async function getPostsByHashtag(req, res) {
   const user_id = res.locals.userId
   try {
     const { rows } = await PostsRepository.getPostsByHashTag(hashtag, user_id, offset);
-    console.log(rows)
     res.status(200).send(rows);
   } catch (err) {
     res.status(500).json(err.message);
