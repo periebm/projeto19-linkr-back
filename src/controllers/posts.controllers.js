@@ -7,7 +7,6 @@ export async function getPosts(req, res) {
     const offset = req.query.offset
     const limit = req.query.limit
     const user_id = res.locals.userId
-    console.log(offset)
     const posts = await PostsRepository.getPosts(user_id, offset, limit);
     res.status(200).send(posts.rows);
   } catch (err) {
@@ -62,10 +61,12 @@ export async function deleteLike(req, res){
 }
 
 export async function getPostsByHashtag(req, res) {
+  const offset = req.query.offset
   const { hashtag } = req.params;
   const user_id = res.locals.userId
   try {
-    const { rows } = await PostsRepository.getPostsByHashTag(hashtag, user_id);
+    const { rows } = await PostsRepository.getPostsByHashTag(hashtag, user_id, offset);
+    console.log(rows)
     res.status(200).send(rows);
   } catch (err) {
     res.status(500).json(err.message);
@@ -115,9 +116,10 @@ export async function updatePost(req, res) {
 
 export async function getPostsById(req, res) {
   const { id } = req.params;
+  const offset = req.query.offset
   
   try {
-    const posts = await PostsRepository.getPostsbyIdDB(res.locals.userId, id);
+    const posts = await PostsRepository.getPostsbyIdDB(res.locals.userId, id, offset);
     res.status(200).send(posts.rows);
   } catch (err) {
     res.status(500).json(err.message);
