@@ -1,9 +1,10 @@
 import { followUserDB, getAlreadyFollowingUserDB, getFollowsDB, getUsersDB, unfollowDB } from "../repositories/users.repositories.js";
 
 export async function getUsers(req, res) {
+    const { id } = req.params;
 
     try {
-        const users = await getUsersDB(res.locals.userId);
+        const users = await getUsersDB(id);
         res.send(users.rows);
     } catch (err) {
         res.status(500).send(err.message)
