@@ -13,7 +13,6 @@ class PostRepository {
                 p.description,
                 p.url,
                   p.createdat,
-            CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
             EXISTS (
             SELECT 1
             FROM likes 
@@ -29,6 +28,7 @@ class PostRepository {
             (
                 SELECT COUNT(*) from comments c WHERE c.post_id = p.id
             ) AS total_comments,
+            (SELECT CAST(COUNT(reposts.post_id) AS INTEGER) FROM reposts WHERE reposts.post_id = p.id) AS total_reposts,
                   
                   NULL AS reposted_by
                   
@@ -48,7 +48,6 @@ class PostRepository {
             p.description,
               p.url,
                   r.createdat,
-            CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
             EXISTS (
             SELECT 1 
             FROM likes 
@@ -64,6 +63,7 @@ class PostRepository {
             (
                 SELECT COUNT(*) from comments c WHERE c.post_id = p.id
             ) AS total_comments,
+            (SELECT CAST(COUNT(reposts.post_id) AS INTEGER) FROM reposts WHERE reposts.post_id = p.id) AS total_reposts,
                   
             (SELECT jsonb_build_object('username', username, 'id', id) 
             FROM users 
@@ -101,7 +101,6 @@ class PostRepository {
 		    p.description,
 		    p.url,
 			  p.createdat,
-	    CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
         EXISTS (
         SELECT 1
         FROM likes 
@@ -117,6 +116,7 @@ class PostRepository {
         (
             SELECT COUNT(*) from comments c WHERE c.post_id = p.id
         ) AS total_comments,
+        (SELECT CAST(COUNT(reposts.post_id) AS INTEGER) FROM reposts WHERE reposts.post_id = p.id) AS total_reposts,
 			  
 			  NULL AS reposted_by
 			  
@@ -136,7 +136,6 @@ class PostRepository {
 		p.description,
 		  p.url,
 			  r.createdat,
-        CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
         EXISTS (
         SELECT 1 
         FROM likes 
@@ -152,6 +151,7 @@ class PostRepository {
         (
             SELECT COUNT(*) from comments c WHERE c.post_id = p.id
         ) AS total_comments,
+        (SELECT CAST(COUNT(reposts.post_id) AS INTEGER) FROM reposts WHERE reposts.post_id = p.id) AS total_reposts,
 			  
 	    (SELECT jsonb_build_object('username', username, 'id', id) 
         FROM users 
@@ -187,7 +187,6 @@ class PostRepository {
 		    p.description,
 		    p.url,
 			  p.createdat,
-	    CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
         EXISTS (
         SELECT 1
         FROM likes 
@@ -203,6 +202,7 @@ class PostRepository {
         (
             SELECT COUNT(*) from comments c WHERE c.post_id = p.id
         ) AS total_comments,
+        (SELECT CAST(COUNT(reposts.post_id) AS INTEGER) FROM reposts WHERE reposts.post_id = p.id) AS total_reposts,
 			  
 			  NULL AS reposted_by
 			  
@@ -222,7 +222,6 @@ class PostRepository {
 		p.description,
 		  p.url,
 			  r.createdat,
-        CAST(COUNT(r.post_id) AS INTEGER) AS total_reposts,
         EXISTS (
         SELECT 1 
         FROM likes 
@@ -238,6 +237,7 @@ class PostRepository {
         (
             SELECT COUNT(*) from comments c WHERE c.post_id = p.id
         ) AS total_comments,
+        (SELECT CAST(COUNT(reposts.post_id) AS INTEGER) FROM reposts WHERE reposts.post_id = p.id) AS total_reposts,
 			  
 	    (SELECT jsonb_build_object('username', username, 'id', id) 
         FROM users 
@@ -340,7 +340,8 @@ class PostRepository {
                     FROM users 
                     WHERE p.user_id = users.id
                 ) AS author,
-                COUNT(c.id) AS total_comments
+                COUNT(c.id) AS total_comments,
+                (SELECT COUNT(reposts.post_id) FROM reposts WHERE reposts.post_id = p.id) AS total_reposts
         FROM posts p
         JOIN trending_posts tr ON p.id = tr.post_id
         JOIN trendings t ON t.id = tr.trending_id
@@ -379,7 +380,8 @@ class PostRepository {
                     FROM users 
                     WHERE p.user_id = users.id
                 ) AS author,
-                COUNT(c.id) AS total_comments
+                COUNT(c.id) AS total_comments,
+                (SELECT CAST(COUNT(reposts.post_id) AS INTEGER) FROM reposts WHERE reposts.post_id = p.id) AS total_reposts
         FROM posts p
         JOIN trending_posts tr ON p.id = tr.post_id
         JOIN trendings t ON t.id = tr.trending_id
@@ -420,7 +422,8 @@ class PostRepository {
             SELECT jsonb_build_object('username', username, 'picture', picture_url) 
             FROM users 
             WHERE p.user_id = users.id
-        ) AS author
+        ) AS author,
+        (SELECT CAST(COUNT(reposts.post_id) AS INTEGER) FROM reposts WHERE reposts.post_id = p.id) AS total_reposts
     FROM users u
     LEFT JOIN posts p ON u.id = p.user_id
     LEFT JOIN likes l ON p.id = l.post_id
@@ -457,7 +460,8 @@ class PostRepository {
             SELECT jsonb_build_object('username', username, 'picture', picture_url) 
             FROM users 
             WHERE p.user_id = users.id
-        ) AS author
+        ) AS author,
+        (SELECT CAST(COUNT(reposts.post_id) AS INTEGER) FROM reposts WHERE reposts.post_id = p.id) AS total_reposts
     FROM users u
     LEFT JOIN posts p ON u.id = p.user_id
     LEFT JOIN likes l ON p.id = l.post_id
